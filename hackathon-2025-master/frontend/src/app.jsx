@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { SortDropdown } from "./components/sort-dropdown";
 import { EventCard } from "./components/event-card";
 import { FilterForm } from "./components/filter-form";
@@ -13,21 +13,25 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
+  
 
   const fetchEvents = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await fetch("/api/events");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       setEvents(getValidEvents(data));
+      setLoading(false);
     } catch (err) {
       setError(err.message);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchEvents();
-  }, [fetchEvents, sortKey]);
+  }, [fetchEvents]);
 
   const displayed = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -51,10 +55,6 @@ const App = () => {
     setQuery(inputRef.current.value);
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-
   if (loading) {
     return <div className="text-center">Loading events…</div>;
   }
@@ -68,9 +68,8 @@ const App = () => {
   }
 
   return (
-    <div className="container py-4">
+    <div className="container py-4" style={{ '--card-bg': bgColor }}>
       <h1 className="text-center mb-4">🏟️ Betting Home Page</h1>
-
       <div className="d-flex justify-content-between align-items-center mb-3">
         <SortDropdown sortKey={sortKey} onChange={setSortKey} />
         <FilterForm onSubmit={handleFormSubmit} />
@@ -85,7 +84,7 @@ const App = () => {
       </div>
 
       {displayed.map((evt) => (
-        <EventCard key={evt.eventID} event={evt} bgColor={bgColor} />
+        <EventCard key={evt.eventID} event={evt} />
       ))}
     </div>
   );

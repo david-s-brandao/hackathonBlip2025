@@ -5,9 +5,14 @@ const sortOptions = [
   { value: "date", label: "Date" },
 ];
 
-export const SortDropdown = ({ sortKey, onChange }) => (
-  <div className="dropdown">
-    <button
+export const SortDropdown = ({ sortKey, onChange }) => {
+  const handleChange = (value) => {
+    onChange(value);
+
+  };
+  return (
+    <div className="dropdown">
+      <button
       className="btn btn-secondary dropdown-toggle"
       type="button"
       data-bs-toggle="dropdown"
@@ -20,12 +25,12 @@ export const SortDropdown = ({ sortKey, onChange }) => (
           <button
             className="dropdown-item"
             type="button"
-            onChange={() => onChange(value)}
+            onClick={() => handleChange(value)}
           >
             {label}
           </button>
         </li>
       ))}
     </ul>
-  </div>
-);
+  </div>);
+};
